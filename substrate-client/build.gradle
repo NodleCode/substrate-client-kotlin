@@ -1,0 +1,48 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm'
+    id 'com.cookpad.android.plugin.license-tools'
+    id 'maven-publish'
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            libraryJar(MavenPublication) {
+                from components.kotlin
+                groupId = 'com.github.NodleCode'
+                artifactId = 'substrate-client'
+                version = '0.1'
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    api group: 'org.slf4j', name:'slf4j-api', version: '1.7.30'
+
+    // websocket
+    implementation 'com.neovisionaries:nv-websocket-client:2.9'
+
+    // json
+    implementation 'org.json:json:20200518'
+
+    // crypto
+    api group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.65'
+    // xxhash
+    api group: 'org.lz4', name: 'lz4-java', version: '1.7.1'
+
+    // BIP-39: key generation from 12 words mnemonic
+    // not a fan of this dependency because it comes with spongy castle which we don't need
+    implementation 'com.github.NodleCode:BIP39:484f9d5d588'
+    implementation 'com.github.komputing:KBase58:0.1'
+
+    // kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation("io.reactivex.rxjava3:rxkotlin:3.0.0")
+
+    // test only dependencies
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'pl.pragmatists:JUnitParams:1.1.1'
+    testImplementation 'com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3'
+}

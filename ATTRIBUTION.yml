@@ -1,0 +1,87 @@
+- artifact: com.github.NodleCode:BIP39:+
+  name: BIP39
+  license: GNU General Public License v3.0
+  licenseUrl: https://api.github.com/licenses/gpl-3.0
+  url: https://novacrypto.github.io/BIP39
+- artifact: com.github.komputing.khash:sha256:+
+  name: sha256
+  license: MIT License
+  licenseUrl: https://api.github.com/licenses/mit
+  url: https://github.com/komputing/KHash
+- artifact: com.github.komputing:KBase58:+
+  name: KBase58
+  license: MIT License
+  licenseUrl: https://api.github.com/licenses/mit
+- artifact: com.madgag.spongycastle:core:+
+  name: core
+  license: Bouncy Castle Licence
+  licenseUrl: http://www.bouncycastle.org/licence.html
+  url: http://rtyley.github.io/spongycastle/
+- artifact: com.neovisionaries:nv-websocket-client:+
+  name: nv-websocket-client
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/TakahikoKawasaki/nv-websocket-client
+- artifact: io.github.novacrypto:SHA256:+
+  name: SHA256
+  license: GNU General Public License v3.0
+  licenseUrl: https://api.github.com/licenses/gpl-3.0
+- artifact: io.github.novacrypto:ToRuntime:+
+  name: ToRuntime
+  license: GNU General Public License v3.0
+  licenseUrl: https://api.github.com/licenses/gpl-3.0
+- artifact: io.reactivex.rxjava3:rxjava:+
+  name: rxjava
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/ReactiveX/RxJava
+- artifact: io.reactivex.rxjava3:rxkotlin:+
+  name: rxkotlin
+  license: The Apache License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/ReactiveX/RxKotlin
+- artifact: org.bouncycastle:bcprov-jdk15on:+
+  name: bcprov-jdk15on
+  license: Bouncy Castle Licence
+  licenseUrl: http://www.bouncycastle.org/licence.html
+  url: http://www.bouncycastle.org/java.html
+- artifact: org.jetbrains.kotlin:kotlin-stdlib-common:+
+  name: kotlin-stdlib-common
+  license: The Apache License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://kotlinlang.org/
+- artifact: org.jetbrains.kotlin:kotlin-stdlib-jdk7:+
+  name: kotlin-stdlib-jdk7
+  license: The Apache License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://kotlinlang.org/
+- artifact: org.jetbrains.kotlin:kotlin-stdlib:+
+  name: kotlin-stdlib
+  license: The Apache License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://kotlinlang.org/
+- artifact: org.jetbrains:annotations:+
+  name: annotations
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: http://www.jetbrains.org
+- artifact: org.json:json:+
+  name: json
+  license: The JSON License
+  licenseUrl: http://json.org/license.html
+  url: https://github.com/douglascrockford/JSON-java
+- artifact: org.lz4:lz4-java:+
+  name: lz4-java
+  license: The Apache Software License, Version 2.0
+  licenseUrl: http://www.apache.org/licenses/LICENSE-2.0.txt
+  url: https://github.com/lz4/lz4-java
+- artifact: org.reactivestreams:reactive-streams:+
+  name: reactive-streams
+  license: CC0
+  licenseUrl: http://creativecommons.org/publicdomain/zero/1.0/
+  url: http://www.reactive-streams.org/
+- artifact: org.slf4j:slf4j-api:+
+  name: slf4j-api
+  license: MIT License
+  licenseUrl: https://api.github.com/licenses/mit
+  url: http://www.slf4j.org
