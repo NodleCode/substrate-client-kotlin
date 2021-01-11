@@ -8,6 +8,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.io.IOException
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -15,15 +16,23 @@ import kotlin.concurrent.withLock
  * @author Lucien Loiseau on 28/05/20.
  */
 class WebSocketRpc(private val substrateRpcUrl: Array<out String>) {
-
     private val log: Logger = LoggerFactory.getLogger(WebSocketRpc::class.java)
     private val lock: ReentrantLock = ReentrantLock()
 
     private var ws: WebSocket? = null
     private var cmdId: Int = 1
-    private val recvChannel = BehaviorSubject.create<JSONObject>()
+    private var recvChannel = BehaviorSubject.create<JSONObject>()
 
     private val webSocketListener: WebSocketListener = object : WebSocketAdapter() {
+        override fun onDisconnected(
+            websocket: WebSocket?,
+            serverCloseFrame: WebSocketFrame?,
+            clientCloseFrame: WebSocketFrame?,
+            closedByServer: Boolean
+        ) {
+            close()
+        }
+
         override fun onTextMessage(websocket: WebSocket?, text: String?) {
             try {
                 val json = JSONObject(text!!)
@@ -49,13 +58,17 @@ class WebSocketRpc(private val substrateRpcUrl: Array<out String>) {
         close()
         substrateRpcUrl.forEachIndexed { index, url ->
             try {
-                ws = WebSocketFactory().createSocket(url)
-                ws?.pingInterval = 1000
+                ws = WebSocketFactory()
+                    .setConnectionTimeout(1000)
+                    .createSocket(url)
+                ws?.pingInterval = 0
                 ws?.addExtension(WebSocketExtension.PERMESSAGE_DEFLATE)
                 ws?.connect()
+
+                cmdId = 1
+                recvChannel = BehaviorSubject.create()
                 ws?.addListener(webSocketListener)
                 return
-
             } catch (e: Exception) {
                 onDebugOnly { log.error("EXCEPTION > ${e.printStackTrace()}") }
                 if (index == substrateRpcUrl.size - 1) {
@@ -71,6 +84,7 @@ class WebSocketRpc(private val substrateRpcUrl: Array<out String>) {
             ws?.removeListener(webSocketListener)
             ws?.disconnect()
             ws = null
+            recvChannel?.onError(IOException("websocket disconnected"))
         } catch (e: Exception) {
             // ignore
         }
@@ -91,9 +105,9 @@ class WebSocketRpc(private val substrateRpcUrl: Array<out String>) {
 
     fun <T> send(method: RpcMethod): Single<T> {
         return Single
-            .just(cmdId++)
+            .just(checkOpen())
+            .map { cmdId++ }
             .map {
-                checkOpen()
                 val json = json {
                     "id" to it
                     "jsonrpc" to "2.0"

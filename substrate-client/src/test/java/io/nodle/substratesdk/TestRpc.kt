@@ -1,6 +1,7 @@
 package io.nodle.substratesdk
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
+import io.nodle.substratesdk.account.Account
 import io.nodle.substratesdk.account.Wallet
 import io.nodle.substratesdk.rpc.SubstrateProvider
 import io.nodle.substratesdk.scale.toU8a
@@ -171,6 +172,24 @@ class TestRpc {
         val tx = tx4.toU8a().toHex()
         val fee4 = tx4.estimateFee(provider).blockingGet()
         Assert.assertThat(fee4, CoreMatchers.not(0.toBigInteger()))
+    }
+
+    @Test
+    fun stage5_testUrlCannotConnect() {
+        val rpcUrl = "wss://ThisSubstrateUrlDoesNotExist.com"
+        val provider = SubstrateProvider(rpcUrl)
+
+        try {
+            val meta = provider.getMetadata().blockingGet()
+            Assert.fail()
+        } catch (e: Exception) {
+        }
+
+        try {
+            val meta = provider.getMetadata().blockingGet()
+            Assert.fail()
+        } catch (e: Exception) {
+        }
     }
 
 }

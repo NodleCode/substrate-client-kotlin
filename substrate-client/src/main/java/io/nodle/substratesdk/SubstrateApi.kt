@@ -7,14 +7,9 @@ import io.nodle.substratesdk.rpc.AuthorSubmitExtrinsic
 import io.nodle.substratesdk.rpc.PaymentQueryInfo
 import io.nodle.substratesdk.rpc.StateGetStorage
 import io.nodle.substratesdk.rpc.SubstrateProvider
-import io.nodle.substratesdk.scale.readAccountInfo
-import io.nodle.substratesdk.scale.readAccountInfoLegacy
-import io.nodle.substratesdk.scale.toU8a
+import io.nodle.substratesdk.scale.*
 import io.nodle.substratesdk.types.*
-import io.nodle.substratesdk.utils.blake128
-import io.nodle.substratesdk.utils.hexToBa
-import io.nodle.substratesdk.utils.toHex
-import io.nodle.substratesdk.utils.xxHash128
+import io.nodle.substratesdk.utils.*
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.functions.Function5
 import org.json.JSONObject
@@ -32,8 +27,8 @@ fun Account.getAccountInfo(provider: SubstrateProvider): Single<AccountInfo> {
             val key = "System".xxHash128() + "Account".xxHash128() + ba.blake128() + ba
             provider.rpc.send<String>(StateGetStorage("0x" + key.toHex())).map {
                 when (metadata.version) {
-                    in 0..11 -> ByteBuffer.wrap(it.hexToBa()).readAccountInfoLegacy()
-                    else -> ByteBuffer.wrap(it.hexToBa()).readAccountInfo()
+                    in 0..11 -> ByteBuffer.wrap(it.hexToBa()).readAccountInfoV1()
+                    else -> ByteBuffer.wrap(it.hexToBa()).readAccountInfoV12()
                 }
             }
         }

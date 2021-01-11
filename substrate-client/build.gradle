@@ -45,4 +45,5 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     testImplementation 'pl.pragmatists:JUnitParams:1.1.1'
     testImplementation 'com.github.doyaaaaaken:kotlin-csv-jvm:0.7.3'
+    testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.30'
 }

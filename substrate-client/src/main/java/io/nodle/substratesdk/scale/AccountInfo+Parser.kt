@@ -13,7 +13,7 @@ import java.nio.ByteOrder
 // with the release of Substrate 2.0, the refCount is represented as u32 instead of u8
 // Substrate v2.0.0 https://github.com/paritytech/substrate/releases/tag/v2.0.0
 // Refcounts are now u32 (#7164) https://github.com/paritytech/substrate/pull/7164
-fun ByteBuffer.readAccountInfo(): AccountInfo {
+fun ByteBuffer.readAccountInfoV12(): AccountInfo {
     return AccountInfo(
         readU32(),
         readU32(),
@@ -26,7 +26,7 @@ fun ByteBuffer.readAccountInfo(): AccountInfo {
     )
 }
 
-fun ByteBuffer.readAccountInfoLegacy(): AccountInfo {
+fun ByteBuffer.readAccountInfoV1(): AccountInfo {
     return AccountInfo(
         readU32(),
         readU8().toUInt(),

@@ -7,6 +7,7 @@ import io.nodle.substratesdk.types.RuntimeMetadata
 import io.nodle.substratesdk.types.TransferCall
 import io.nodle.substratesdk.types.findCall
 import io.nodle.substratesdk.utils.hexToBa
+import io.nodle.substratesdk.utils.onDebugOnly
 import io.reactivex.rxjava3.core.Single
 import org.json.JSONObject
 import java.math.BigInteger
