@@ -6,6 +6,7 @@ import io.nodle.substratesdk.account.Wallet
 import io.nodle.substratesdk.rpc.SubstrateProvider
 import io.nodle.substratesdk.scale.toU8a
 import io.nodle.substratesdk.utils.toHex
+import io.reactivex.rxjava3.kotlin.subscribeBy
 import junitparams.JUnitParamsRunner
 import junitparams.Parameters
 import org.hamcrest.CoreMatchers
@@ -14,6 +15,8 @@ import org.junit.FixMethodOrder
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
+import org.mockserver.client.server.MockServerClient
+import org.mockserver.integration.ClientAndServer
 
 /**
  * @author Lucien Loiseau on 31/05/20.
@@ -169,7 +172,6 @@ class TestRpc {
         Assert.assertThat(fee3, CoreMatchers.not(0.toBigInteger()))
 
         val tx4 = src.signTx(provider, destWallet, 1000000000000.toBigInteger()).blockingGet()
-        val tx = tx4.toU8a().toHex()
         val fee4 = tx4.estimateFee(provider).blockingGet()
         Assert.assertThat(fee4, CoreMatchers.not(0.toBigInteger()))
     }
@@ -179,17 +181,29 @@ class TestRpc {
         val rpcUrl = "wss://ThisSubstrateUrlDoesNotExist.com"
         val provider = SubstrateProvider(rpcUrl)
 
-        try {
-            val meta = provider.getMetadata().blockingGet()
-            Assert.fail()
-        } catch (e: Exception) {
-        }
+        provider.getMetadata()
+            .subscribeBy(
+                onError = {
+                },
+                onSuccess = {
+                    Assert.fail()
+                })
 
-        try {
-            val meta = provider.getMetadata().blockingGet()
-            Assert.fail()
-        } catch (e: Exception) {
-        }
+        var mockServer: MockServerClient = MockServerClient("localhost", 5568)
+        val url = "http://localhost:5568"
     }
 
+    @Test
+    fun stage5_testUrlCannotWebSocket() {
+        val rpcUrl = "ws://google.com/"
+        val provider = SubstrateProvider(rpcUrl)
+
+        provider.getMetadata()
+            .subscribeBy(
+                onError = {
+                },
+                onSuccess = {
+                    Assert.fail()
+                })
+    }
 }

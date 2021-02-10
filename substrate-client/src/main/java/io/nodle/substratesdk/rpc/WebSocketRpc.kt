@@ -53,7 +53,7 @@ class WebSocketRpc(private val substrateRpcUrl: Array<out String>) {
         }
     }
 
-    @Throws(WebSocketException::class)
+    @Throws(Exception::class)
     private fun open() {
         close()
         substrateRpcUrl.forEachIndexed { index, url ->
@@ -70,7 +70,6 @@ class WebSocketRpc(private val substrateRpcUrl: Array<out String>) {
                 ws?.addListener(webSocketListener)
                 return
             } catch (e: Exception) {
-                onDebugOnly { log.error("EXCEPTION > ${e.printStackTrace()}") }
                 if (index == substrateRpcUrl.size - 1) {
                     throw e
                 }
@@ -84,7 +83,9 @@ class WebSocketRpc(private val substrateRpcUrl: Array<out String>) {
             ws?.removeListener(webSocketListener)
             ws?.disconnect()
             ws = null
-            recvChannel?.onError(IOException("websocket disconnected"))
+            if (recvChannel?.hasObservers() == true) {
+                recvChannel?.onError(IOException("websocket disconnected"))
+            }
         } catch (e: Exception) {
             // ignore
         }
@@ -105,7 +106,7 @@ class WebSocketRpc(private val substrateRpcUrl: Array<out String>) {
 
     fun <T> send(method: RpcMethod): Single<T> {
         return Single
-            .just(checkOpen())
+            .fromCallable { checkOpen() }
             .map { cmdId++ }
             .map {
                 val json = json {
