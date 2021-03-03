@@ -101,3 +101,5 @@ fun Wallet.signAndSend(
         .signTx(provider, destAccount, amount, era)
         .flatMap { it.send(provider) }
 }
+
+fun getVersion(): String = GIT_SHA

@@ -2,6 +2,14 @@ plugins {
     id 'org.jetbrains.kotlin.jvm'
     id 'com.cookpad.android.plugin.license-tools'
     id 'maven-publish'
+    id 'com.peterabeles.gversion'
+}
+
+gversion {
+    srcDir       = "src/main/java/"           // path is relative to the sub-project by default
+    classPackage = "io.nodle.substratesdk"
+    debug        = false                      // optional. print out extra debug information
+    language     = "kotlin"                   // optional. Can be Java, Kotlin, YAML, or Properties. Case insensitive.
 }
 
 afterEvaluate {
@@ -16,6 +24,8 @@ afterEvaluate {
         }
     }
 }
+
+project.compileKotlin.dependsOn(createVersionFile)
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])

@@ -3,7 +3,7 @@
 .idea/
 release/
 mapping.txt
-
+GVersion.kt
 # Android Studio
 .project
 .settings/
