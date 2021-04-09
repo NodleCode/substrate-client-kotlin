@@ -72,6 +72,10 @@ fun String.toU8a(): ByteArray {
     return buf.size.toLong().toCompactU8a() + buf
 }
 
+fun ByteArray.toU8a(): ByteArray {
+    return this.size.toLong().toCompactU8a() + this
+}
+
 fun <T> List<T>.toU8a(toU8a: T.() -> ByteArray): ByteArray {
     var buf = ByteArray(0)
     forEach {
