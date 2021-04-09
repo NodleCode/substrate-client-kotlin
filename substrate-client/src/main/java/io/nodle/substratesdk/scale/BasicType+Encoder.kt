@@ -10,6 +10,12 @@ import kotlin.math.pow
 /**
  * @author Lucien Loiseau on 14/08/20.
  */
+
+fun Byte.toU8a(): ByteArray = ByteBuffer.allocate(1)
+    .order(ByteOrder.LITTLE_ENDIAN)
+    .put(this)
+    .array()
+
 fun Short.toU8a(): ByteArray = ByteBuffer.allocate(2)
     .order(ByteOrder.LITTLE_ENDIAN)
     .putShort(this)

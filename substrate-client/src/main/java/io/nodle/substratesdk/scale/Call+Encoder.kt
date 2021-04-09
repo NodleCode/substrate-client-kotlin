@@ -14,7 +14,7 @@ fun ExtrinsicCall.toU8a(): ByteArray {
 
 fun TransferCall.toU8a(): ByteArray {
     return byteArrayOf(moduleIndex.toByte(), callIndex.toByte()) +
-            byteArrayOf(0xff.toByte()) +
-            destAccount.toU8a() +
+            destAccount.toMultiAddress().toU8a() +
             amount.toCompactU8a()
 }
+

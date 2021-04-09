@@ -7,7 +7,7 @@ import io.nodle.substratesdk.types.*
  */
 
 fun MultiAddress.toU8a(): ByteArray {
-    return byteArrayOf(type.id.toByte()) +
+    return type.id.toByte().toU8a() +
             when (type) {
                 AddressType.AccountID -> (this as AccountIDAddress).pubkey
                 AddressType.Raw -> (this as RawAddress).bytes.toU8a()

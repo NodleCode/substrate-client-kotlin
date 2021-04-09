@@ -1,9 +1,5 @@
 package io.nodle.substratesdk.types
 
-import io.nodle.substratesdk.account.signMsg
-import io.nodle.substratesdk.scale.toU8a
-import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters
-import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters
 import java.math.BigInteger
 
 /**
@@ -15,14 +11,14 @@ data class Extrinsic(
 )
 
 data class ExtrinsicSignature(
-    val signer: Ed25519PublicKeyParameters,
+    val signer: MultiAddress,
     val signature: ExtrinsicEd25519Signature,
     val era: ExtrinsicEra,
     val nonce: Long,
     val tip: BigInteger
 )
 
-data class ExtrinsicEd25519Signature(val ed25519: ByteArray)
+data class ExtrinsicEd25519Signature(val signature: ByteArray)
 
 abstract class ExtrinsicEra
 

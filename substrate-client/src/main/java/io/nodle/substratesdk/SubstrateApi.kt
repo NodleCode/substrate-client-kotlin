@@ -8,6 +8,7 @@ import io.nodle.substratesdk.rpc.PaymentQueryInfo
 import io.nodle.substratesdk.rpc.StateGetStorage
 import io.nodle.substratesdk.rpc.SubstrateProvider
 import io.nodle.substratesdk.scale.*
+import io.nodle.substratesdk.scale.v1.readAccountInfoV1
 import io.nodle.substratesdk.types.*
 import io.nodle.substratesdk.utils.*
 import io.reactivex.rxjava3.core.Single
@@ -64,9 +65,9 @@ fun Wallet.signTx(
                 BigInteger.ZERO,
                 transactionVersion
             )
-            val signature = privateKey.signMsg(payload.toU8a())
+            val signature = privateKey.signMsg(payload.toU8a(provider))
             val extrinsicSignature = ExtrinsicSignature(
-                privateKey.generatePublicKey(),
+                AccountIDAddress(privateKey.generatePublicKey()),
                 ExtrinsicEd25519Signature(signature),
                 era,
                 sourceWalletInfo.nonce.toLong(),
@@ -82,12 +83,12 @@ fun Wallet.signTx(
 
 fun Extrinsic.estimateFee(provider: SubstrateProvider): Single<BigInteger> {
     return provider.rpc
-        .send<JSONObject>(PaymentQueryInfo("0x" + this.toU8a().toHex()))
+        .send<JSONObject>(PaymentQueryInfo("0x" + toU8a(provider).toHex()))
         .map { it.getString("partialFee").toBigInteger() }
 }
 
 fun Extrinsic.send(provider: SubstrateProvider): Single<String> {
-    return provider.rpc.send(AuthorSubmitExtrinsic("0x" + this.toU8a().toHex()))
+    return provider.rpc.send(AuthorSubmitExtrinsic("0x" + toU8a(provider).toHex()))
 }
 
 @ExperimentalUnsignedTypes

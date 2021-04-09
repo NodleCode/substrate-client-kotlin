@@ -1,5 +1,7 @@
 package io.nodle.substratesdk.types
 
+import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters
+
 /**
  * @author Lucien Loiseau on 09/04/21.
  */
@@ -19,7 +21,9 @@ abstract class MultiAddress(val type: AddressType)
 
 // public key
 class AccountIDAddress(val pubkey: ByteArray) :
-    MultiAddress(AddressType.AccountID)
+    MultiAddress(AddressType.AccountID) {
+    constructor(ed: Ed25519PublicKeyParameters) : this(ed.encoded)
+}
 
 // encoded string
 class RawAddress(val bytes: ByteArray) : MultiAddress(AddressType.Raw)
