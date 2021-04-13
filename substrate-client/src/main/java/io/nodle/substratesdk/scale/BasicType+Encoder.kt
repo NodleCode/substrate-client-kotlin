@@ -10,6 +10,12 @@ import kotlin.math.pow
 /**
  * @author Lucien Loiseau on 14/08/20.
  */
+
+fun Byte.toU8a(): ByteArray = ByteBuffer.allocate(1)
+    .order(ByteOrder.LITTLE_ENDIAN)
+    .put(this)
+    .array()
+
 fun Short.toU8a(): ByteArray = ByteBuffer.allocate(2)
     .order(ByteOrder.LITTLE_ENDIAN)
     .putShort(this)
@@ -70,6 +76,10 @@ fun BigInteger.toCompactU8a(): ByteArray {
 fun String.toU8a(): ByteArray {
     val buf = this.toByteArray(charset = Charset.defaultCharset())
     return buf.size.toLong().toCompactU8a() + buf
+}
+
+fun ByteArray.toU8a(): ByteArray {
+    return this.size.toLong().toCompactU8a() + this
 }
 
 fun <T> List<T>.toU8a(toU8a: T.() -> ByteArray): ByteArray {

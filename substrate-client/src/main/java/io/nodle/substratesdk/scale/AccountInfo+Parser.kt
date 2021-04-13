@@ -9,6 +9,7 @@ import java.nio.ByteOrder
  * @author Lucien Loiseau on 30/07/20.
  */
 
+class ScaleEncoderException(msg: String?) : Exception(msg)
 
 // with the release of Substrate 2.0, the refCount is represented as u32 instead of u8
 // Substrate v2.0.0 https://github.com/paritytech/substrate/releases/tag/v2.0.0
@@ -17,19 +18,6 @@ fun ByteBuffer.readAccountInfoV12(): AccountInfo {
     return AccountInfo(
         readU32(),
         readU32(),
-        AccountData(
-            readU128(),
-            readU128(),
-            readU128(),
-            readU128()
-        )
-    )
-}
-
-fun ByteBuffer.readAccountInfoV1(): AccountInfo {
-    return AccountInfo(
-        readU32(),
-        readU8().toUInt(),
         AccountData(
             readU128(),
             readU128(),

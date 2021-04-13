@@ -1,5 +1,7 @@
 package io.nodle.substratesdk.account
 
+import io.nodle.substratesdk.types.AccountIDAddress
+import io.nodle.substratesdk.types.MultiAddress
 import io.nodle.substratesdk.utils.hexToBa
 import io.nodle.substratesdk.utils.toHex
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters
@@ -42,6 +44,10 @@ open class Account() {
             throw InvalidAccount()
         }
         ss58 = accountBa.toSS58()
+    }
+
+    fun toMultiAddress(): MultiAddress {
+        return AccountIDAddress(ss58.ss58ToBa())
     }
 
     fun toSS58(): String {
