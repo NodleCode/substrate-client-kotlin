@@ -46,6 +46,7 @@ dependencies {
     implementation 'com.github.komputing:KBase58:0.1'
 
     // kotlin
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutine"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation("io.reactivex.rxjava3:rxkotlin:3.0.0")
 

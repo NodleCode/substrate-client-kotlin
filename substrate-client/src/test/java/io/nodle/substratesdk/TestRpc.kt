@@ -7,6 +7,8 @@ import io.nodle.substratesdk.rpc.SubstrateProvider
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import junitparams.JUnitParamsRunner
 import junitparams.Parameters
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers
 import org.junit.Assert
 import org.junit.FixMethodOrder
@@ -40,7 +42,7 @@ class TestRpc {
     @ExperimentalUnsignedTypes
     @Test
     @Parameters(method = "testChainConfig")
-    fun stage0_testMetadata(rpcUrl: String, aliceMnemonic: String, bobMnemonic: String) {
+    fun stage0_testMetadata(rpcUrl: String, aliceMnemonic: String, bobMnemonic: String, carlaMnemonic: String) {
         val provider = SubstrateProvider(rpcUrl)
 
         val meta = provider.getMetadata().blockingGet()
@@ -52,7 +54,7 @@ class TestRpc {
 
     @Test
     @Parameters(method = "testChainConfig")
-    fun stage0_testGenesisHash(rpcUrl: String, aliceMnemonic: String, bobMnemonic: String) {
+    fun stage0_testGenesisHash(rpcUrl: String, aliceMnemonic: String, bobMnemonic: String, carlaMnemonic: String) {
         val provider = SubstrateProvider(rpcUrl)
         val hash = provider.getGenesisHash().blockingGet()
         Assert.assertThat(
@@ -63,7 +65,7 @@ class TestRpc {
 
     @Test
     @Parameters(method = "testChainConfig")
-    fun stage0_testSpecVersion(rpcUrl: String, aliceMnemonic: String, bobMnemonic: String) {
+    fun stage0_testSpecVersion(rpcUrl: String, aliceMnemonic: String, bobMnemonic: String, carlaMnemonic: String) {
         val provider = SubstrateProvider(rpcUrl)
         val specVersion = provider.getSpecVersion().blockingGet()
         Assert.assertThat(
@@ -74,7 +76,7 @@ class TestRpc {
 
     @Test
     @Parameters(method = "testChainConfig")
-    fun stage0_testTransactionVersion(rpcUrl: String, aliceMnemonic: String, bobMnemonic: String) {
+    fun stage0_testTransactionVersion(rpcUrl: String, aliceMnemonic: String, bobMnemonic: String, carlaMnemonic: String) {
         val provider = SubstrateProvider(rpcUrl)
         val specVersion = provider.getTransactionVersion().blockingGet()
         Assert.assertThat(
@@ -85,8 +87,15 @@ class TestRpc {
 
     @Test
     @Parameters(method = "testChainConfig")
-    fun stage1_testBalance(rpcUrl: String, aliceMnemonic: String, bobMnemonic: String) {
+    fun stage1_testBalance(rpcUrl: String, aliceMnemonic: String, bobMnemonic: String, carlaMnemonic: String) {
         val provider = SubstrateProvider(rpcUrl)
+
+        val wallet1 =
+            Wallet(carlaMnemonic)
+        val balance1 = wallet1.getAccountInfo(provider).blockingGet()
+        Assert.assertThat(balance1.data.free.toLong(), CoreMatchers.equalTo(1000000000000))
+
+        runBlocking { delay(20000) }
 
         val wallet2 =
             Wallet(aliceMnemonic)
@@ -102,7 +111,7 @@ class TestRpc {
     @ExperimentalUnsignedTypes
     @Test
     @Parameters(method = "testChainConfig")
-    fun stage2_testSignTx(rpcUrl: String, aliceMnemonic: String, bobMnemonic: String) {
+    fun stage2_testSignTx(rpcUrl: String, aliceMnemonic: String, bobMnemonic: String, carlaMnemonic: String) {
         val provider = SubstrateProvider(rpcUrl)
         val src =
             Wallet(aliceMnemonic)
@@ -115,7 +124,7 @@ class TestRpc {
     @ExperimentalUnsignedTypes
     @Test
     @Parameters(method = "testChainConfig")
-    fun stage3_testTransfer(rpcUrl: String, aliceMnemonic: String, bobMnemonic: String) {
+    fun stage3_testTransfer(rpcUrl: String, aliceMnemonic: String, bobMnemonic: String, carlaMnemonic: String) {
         val provider = SubstrateProvider(rpcUrl)
 
         val wallet1 =
@@ -151,7 +160,7 @@ class TestRpc {
     @ExperimentalUnsignedTypes
     @Test
     @Parameters(method = "testChainConfig")
-    fun stage4_testEstimateFee(rpcUrl: String, aliceMnemonic: String, bobMnemonic: String) {
+    fun stage4_testEstimateFee(rpcUrl: String, aliceMnemonic: String, bobMnemonic: String, carlaMnemonic: String) {
         val provider = SubstrateProvider(rpcUrl)
         val src = Wallet(aliceMnemonic)
         val destWallet = Wallet(bobMnemonic)

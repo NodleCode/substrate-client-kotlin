@@ -4,6 +4,9 @@ import com.neovisionaries.ws.client.*
 import io.nodle.substratesdk.utils.onDebugOnly
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.Logger
@@ -24,6 +27,43 @@ class WebSocketRpc(private val substrateRpcUrl: Array<out String>) {
     private var recvChannel = BehaviorSubject.create<JSONObject>()
 
     private val webSocketListener: WebSocketListener = object : WebSocketAdapter() {
+        private var timeout: Job? = null
+        private var mutex = Mutex()
+
+        private fun resetTimeout() {
+            runBlocking {
+                mutex.withLock {
+                    timeout?.cancel()
+                    timeout = GlobalScope.launch {
+                        delay(10000)
+                        if (isActive) {
+                            onDebugOnly { log.debug("substrate rpc -- timeout fired, closing websocket") }
+                            timeout = null
+                            close()
+                        }
+                    }
+                }
+            }
+        }
+
+        override fun onConnected(
+            websocket: WebSocket?,
+            headers: MutableMap<String, MutableList<String>>?
+        ) {
+            super.onConnected(websocket, headers)
+            resetTimeout()
+        }
+
+        override fun onFrameSent(websocket: WebSocket?, frame: WebSocketFrame?) {
+            super.onFrameSent(websocket, frame)
+            resetTimeout()
+        }
+
+        override fun onFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
+            super.onFrame(websocket, frame)
+            resetTimeout()
+        }
+
         override fun onDisconnected(
             websocket: WebSocket?,
             serverCloseFrame: WebSocketFrame?,
