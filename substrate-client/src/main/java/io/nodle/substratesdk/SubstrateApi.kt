@@ -9,6 +9,7 @@ import io.nodle.substratesdk.rpc.StateGetStorage
 import io.nodle.substratesdk.rpc.SubstrateProvider
 import io.nodle.substratesdk.scale.*
 import io.nodle.substratesdk.scale.v1.readAccountInfoV1
+import io.nodle.substratesdk.scale.v2.readAccountInfoV12
 import io.nodle.substratesdk.types.*
 import io.nodle.substratesdk.utils.*
 import io.reactivex.rxjava3.core.Single
@@ -26,10 +27,10 @@ fun Account.getAccountInfo(provider: SubstrateProvider): Single<AccountInfo> {
         .flatMap { metadata ->
             val ba = toU8a()
             val key = "System".xxHash128() + "Account".xxHash128() + ba.blake128() + ba
-            provider.rpc.send<String>(StateGetStorage("0x" + key.toHex())).map {
+            provider.rpc.send<String>(StateGetStorage("0x" + key.toHex())).map { scale ->
                 when (metadata.version) {
-                    in 0..11 -> ByteBuffer.wrap(it.hexToBa()).readAccountInfoV1()
-                    else -> ByteBuffer.wrap(it.hexToBa()).readAccountInfoV12()
+                    in 0..11 -> ByteBuffer.wrap(scale.hexToBa()).readAccountInfoV1()
+                    else -> ByteBuffer.wrap(scale.hexToBa()).readAccountInfoSub3()
                 }
             }
         }

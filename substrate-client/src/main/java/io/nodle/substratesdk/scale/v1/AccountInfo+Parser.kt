@@ -16,6 +16,7 @@ fun ByteBuffer.readAccountInfoV1(): AccountInfo {
     return AccountInfo(
         readU32(),
         readU8().toUInt(),
+        0.toUInt(),
         AccountData(
             readU128(),
             readU128(),

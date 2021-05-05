@@ -7,7 +7,8 @@ import java.math.BigInteger
  */
 data class AccountInfo(
     var nonce: UInt,
-    var refCount: UInt,
+    var consumers: UInt,
+    var providers: UInt,
     var data: AccountData
 )
 
