@@ -18,7 +18,7 @@ import kotlin.concurrent.withLock
 /**
  * @author Lucien Loiseau on 28/05/20.
  */
-class WebSocketRpc(private val substrateRpcUrl: Array<out String>) {
+class WebSocketRpc(private val substrateRpcUrl: Array<out String>) : SubstrateRpc {
     private val log: Logger = LoggerFactory.getLogger(WebSocketRpc::class.java)
     private val lock: ReentrantLock = ReentrantLock()
 
@@ -144,7 +144,7 @@ class WebSocketRpc(private val substrateRpcUrl: Array<out String>) {
             .firstOrError()
     }
 
-    fun <T> send(method: RpcMethod): Single<T> {
+    override fun <T> send(method: RpcMethod): Single<T> {
         return Single
             .fromCallable { checkOpen() }
             .map { cmdId++ }
