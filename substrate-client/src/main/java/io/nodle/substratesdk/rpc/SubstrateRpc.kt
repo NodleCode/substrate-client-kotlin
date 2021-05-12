@@ -1,5 +1,6 @@
 package io.nodle.substratesdk.rpc
 
+import io.nodle.substratesdk.utils.onDebugOnly
 import io.reactivex.rxjava3.core.Single
 
 /**
@@ -26,7 +27,7 @@ class SubstrateRpc(substrateUrls: Array<out String>) : ISubstrateRpc {
                     try {
                         return@map rpc.send<T>(method).blockingGet()
                     } catch (e: Exception) {
-                        e.printStackTrace()
+                        // ignore
                     }
                 }
                 throw Exception()

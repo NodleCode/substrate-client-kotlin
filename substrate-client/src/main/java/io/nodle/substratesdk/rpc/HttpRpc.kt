@@ -17,40 +17,38 @@ class HttpRpc(private val url: String) : ISubstrateRpc {
     override fun <T> send(method: RpcMethod): Single<T> {
         return Single.just(url)
             .map { url ->
-                try {
-                    val connection = (URL(url).openConnection() as HttpURLConnection)
-                    val json = json {
-                        "id" to 1
-                        "jsonrpc" to "2.0"
-                        "method" to method.method
-                        "params" to method.params
-                    }
-                    onDebugOnly { log.debug("rpc ($url) > $json") }
+                val connection = (URL(url).openConnection() as HttpURLConnection)
+                val json = json {
+                    "id" to 1
+                    "jsonrpc" to "2.0"
+                    "method" to method.method
+                    "params" to method.params
+                }
+                onDebugOnly { log.debug("rpc ($url) > $json") }
 
-                    connection.requestMethod = "POST"
-                    connection.doInput = true
-                    connection.doOutput = true
-                    connection.connectTimeout = 10000
-                    connection.readTimeout = 10000
-                    connection.setRequestProperty("User-Agent", "Mozilla/5.0") // Java/* is blocked by cloudflare
-                    connection.setRequestProperty("Content-Type", "application/json")
-                    connection.instanceFollowRedirects = true
-                    connection.connect()
-                    val out = connection.outputStream
-                    out.write(json.toString().toByteArray())
+                connection.requestMethod = "POST"
+                connection.doInput = true
+                connection.doOutput = true
+                connection.connectTimeout = 10000
+                connection.readTimeout = 10000
+                connection.setRequestProperty(
+                    "User-Agent",
+                    "Mozilla/5.0"
+                ) // Java/* is blocked by cloudflare
+                connection.setRequestProperty("Content-Type", "application/json")
+                connection.instanceFollowRedirects = true
+                connection.connect()
+                val out = connection.outputStream
+                out.write(json.toString().toByteArray())
 
-                    if (connection.responseCode == HttpURLConnection.HTTP_ACCEPTED ||
-                        connection.responseCode == HttpURLConnection.HTTP_OK
-                    ) {
-                        val response = String(connection.inputStream.readBytes())
-                        onDebugOnly { log.debug("rpc ($url) < $response") }
-                        JSONObject(response)
-                    } else {
-                        throw Exception()
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    throw e
+                if (connection.responseCode == HttpURLConnection.HTTP_ACCEPTED ||
+                    connection.responseCode == HttpURLConnection.HTTP_OK
+                ) {
+                    val response = String(connection.inputStream.readBytes())
+                    onDebugOnly { log.debug("rpc ($url) < $response") }
+                    JSONObject(response)
+                } else {
+                    throw Exception()
                 }
             }
             .map {
