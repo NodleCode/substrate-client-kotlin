@@ -1,7 +1,6 @@
 package io.nodle.substratesdk.rpc
 
 import io.nodle.substratesdk.utils.onDebugOnly
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import org.json.JSONObject
 import org.slf4j.Logger
@@ -12,23 +11,11 @@ import java.net.URL
 /**
  * @author Lucien Loiseau on 12/05/21.
  */
-class HttpRpc(private val substrateRpcUrl: Array<out String>) : SubstrateRpc {
+class HttpRpc(private val url: String) : ISubstrateRpc {
     private val log: Logger = LoggerFactory.getLogger(HttpRpc::class.java)
 
-    private fun open() : HttpURLConnection? {
-        substrateRpcUrl.forEachIndexed { _, url ->
-            try {
-                return (URL(url).openConnection() as HttpURLConnection)
-            } catch (e: Exception) {
-                // iterate with next url
-            }
-        }
-        return null
-    }
-
     override fun <T> send(method: RpcMethod): Single<T> {
-        return Observable
-            .fromIterable(substrateRpcUrl.asIterable())
+        return Single.just(url)
             .map { url ->
                 try {
                     val connection = (URL(url).openConnection() as HttpURLConnection)
@@ -38,36 +25,34 @@ class HttpRpc(private val substrateRpcUrl: Array<out String>) : SubstrateRpc {
                         "method" to method.method
                         "params" to method.params
                     }
-                    onDebugOnly { log.debug("substrate rpc > $json") }
+                    onDebugOnly { log.debug("rpc ($url) > $json") }
 
                     connection.requestMethod = "POST"
                     connection.doInput = true
                     connection.doOutput = true
                     connection.connectTimeout = 10000
                     connection.readTimeout = 10000
+                    connection.setRequestProperty("User-Agent", "Mozilla/5.0") // Java/* is blocked by cloudflare
+                    connection.setRequestProperty("Content-Type", "application/json")
                     connection.instanceFollowRedirects = true
                     connection.connect()
                     val out = connection.outputStream
-
-                    // send bundle
                     out.write(json.toString().toByteArray())
 
-                    // return response code
                     if (connection.responseCode == HttpURLConnection.HTTP_ACCEPTED ||
-                        connection.responseCode == HttpURLConnection.HTTP_OK) {
-                        // response may contain multiple bundle
-                        val response = connection.inputStream.readBytes().toString()
+                        connection.responseCode == HttpURLConnection.HTTP_OK
+                    ) {
+                        val response = String(connection.inputStream.readBytes())
+                        onDebugOnly { log.debug("rpc ($url) < $response") }
                         JSONObject(response)
                     } else {
-                        null
+                        throw Exception()
                     }
                 } catch (e: Exception) {
-                    null
+                    e.printStackTrace()
+                    throw e
                 }
             }
-            .filter { it != null }
-            .map { it as JSONObject }
-            .firstOrError()
             .map {
                 if (it.has("error")) {
                     throw Exception(it.getJSONObject("error").toString())

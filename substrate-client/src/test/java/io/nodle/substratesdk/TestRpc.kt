@@ -95,7 +95,7 @@ class TestRpc {
         val balance1 = wallet1.getAccountInfo(provider).blockingGet()
         Assert.assertThat(balance1.data.free.toLong(), CoreMatchers.equalTo(1000000000000))
 
-        runBlocking { delay(20000) }
+        runBlocking { delay(12000) }
 
         val wallet2 =
             Wallet(aliceMnemonic)
