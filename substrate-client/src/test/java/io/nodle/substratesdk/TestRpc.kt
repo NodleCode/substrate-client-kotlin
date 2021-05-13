@@ -1,6 +1,7 @@
 package io.nodle.substratesdk
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
+import com.google.common.collect.Range.greaterThan
 import io.nodle.substratesdk.account.Account
 import io.nodle.substratesdk.account.Wallet
 import io.nodle.substratesdk.rpc.SubstrateProvider
@@ -16,6 +17,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import org.mockserver.client.server.MockServerClient
+import sun.font.CoreMetrics
 
 /**
  * @author Lucien Loiseau on 31/05/20.
@@ -95,7 +97,7 @@ class TestRpc {
         val balance1 = wallet1.getAccountInfo(provider).blockingGet()
         Assert.assertThat(balance1.data.free.toLong(), CoreMatchers.equalTo(1000000000000))
 
-        runBlocking { delay(20000) }
+        runBlocking { delay(12000) }
 
         val wallet2 =
             Wallet(aliceMnemonic)
@@ -113,10 +115,8 @@ class TestRpc {
     @Parameters(method = "testChainConfig")
     fun stage2_testSignTx(rpcUrl: String, aliceMnemonic: String, bobMnemonic: String, carlaMnemonic: String) {
         val provider = SubstrateProvider(rpcUrl)
-        val src =
-            Wallet(aliceMnemonic)
-        val destWallet =
-            Wallet(bobMnemonic)
+        val src = Wallet(aliceMnemonic)
+        val destWallet = Wallet(bobMnemonic)
         val txhash = src.signTx(provider, destWallet, 10.toBigInteger()).blockingGet()
         Assert.assertThat(txhash, CoreMatchers.notNullValue())
     }
@@ -127,29 +127,62 @@ class TestRpc {
     fun stage3_testTransfer(rpcUrl: String, aliceMnemonic: String, bobMnemonic: String, carlaMnemonic: String) {
         val provider = SubstrateProvider(rpcUrl)
 
-        val wallet1 =
-            Wallet(aliceMnemonic)
+        val wallet1 = Wallet(aliceMnemonic)
         val balance1 = wallet1.getAccountInfo(provider).blockingGet().data.free.toLong()
         Assert.assertThat(balance1, CoreMatchers.notNullValue())
 
-        val wallet2 =
-            Wallet(bobMnemonic)
+        val wallet2 = Wallet(bobMnemonic)
         val balance2 = wallet2.getAccountInfo(provider).blockingGet().data.free.toLong()
         Assert.assertThat(balance2, CoreMatchers.notNullValue())
 
+        val balancesrc : Long
         val walletsrc = if (balance1 < balance2) {
+            balancesrc = balance2
             wallet2
         } else {
+            balancesrc = balance1
             wallet1
         }
+
+        val balancedst : Long
         val walletdst = if (balance1 < balance2) {
+            balancedst = balance1
             wallet1
         } else {
+            balancedst = balance2
             wallet2
         }
 
-        val txhash1 = walletsrc.signAndSend(provider, walletdst, 10.toBigInteger()).blockingGet()
+        // estimate fee
+        val tx1 = walletsrc.signTx(provider, walletdst, 1000000.toBigInteger()).blockingGet()
+        val fee1 = tx1.estimateFee(provider).blockingGet()
+
+        // send fund
+        val txhash1 = walletsrc.signAndSend(provider, walletdst, 1000000.toBigInteger()).blockingGet()
         Assert.assertThat(txhash1, CoreMatchers.notNullValue())
+
+        // wait for transaction to be validated
+        runBlocking {
+            delay(15000)
+        }
+
+        // check that balance as changed and amount is coherent
+        val balanceSrcAfter = walletsrc.getAccountInfo(provider).blockingGet().data.free.toLong()
+        Assert.assertThat(balanceSrcAfter < balancesrc,  CoreMatchers.equalTo(true))
+        val expected = (fee1.toLong() + 1000000)
+        val actual = (balancesrc - balanceSrcAfter)
+        val diff = expected - actual
+        val ratio = diff*100/expected
+
+        // we shouldn't expect more than a 10% slip from expected price
+        Assert.assertThat(ratio < 10, CoreMatchers.equalTo(true))
+
+
+        val balanceDstAfter = walletdst.getAccountInfo(provider).blockingGet().data.free.toLong()
+        Assert.assertThat(balanceDstAfter > balancedst, CoreMatchers.equalTo(true))
+
+        // destination should receive exactly what's expected
+        Assert.assertThat(balanceDstAfter - balancedst, CoreMatchers.equalTo(1000000))
 
         /* todo: mortal era does not work!
         val txhash2 = walletsrc.signAndSend(provider, walletdst, 10.toBigInteger(), MortalEra(64,38)).blockingGet()

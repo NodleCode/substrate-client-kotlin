@@ -18,7 +18,7 @@ import kotlin.concurrent.withLock
 /**
  * @author Lucien Loiseau on 28/05/20.
  */
-class WebSocketRpc(private val substrateRpcUrl: Array<out String>) {
+class WebSocketRpc(private val url: String) : ISubstrateRpc {
     private val log: Logger = LoggerFactory.getLogger(WebSocketRpc::class.java)
     private val lock: ReentrantLock = ReentrantLock()
 
@@ -28,16 +28,16 @@ class WebSocketRpc(private val substrateRpcUrl: Array<out String>) {
 
     private val webSocketListener: WebSocketListener = object : WebSocketAdapter() {
         private var timeout: Job? = null
-        private var mutex = Mutex()
+        private val mutex = Mutex()
 
         private fun resetTimeout() {
             runBlocking {
                 mutex.withLock {
                     timeout?.cancel()
-                    timeout = GlobalScope.launch {
-                        delay(10000)
+                    timeout = CoroutineScope(Dispatchers.Default).launch {
+                        delay(20000)
                         if (isActive) {
-                            onDebugOnly { log.debug("substrate rpc -- timeout fired, closing websocket") }
+                            onDebugOnly { log.debug("rpc ($url) -- timeout fired, closing websocket") }
                             timeout = null
                             close()
                         }
@@ -76,7 +76,7 @@ class WebSocketRpc(private val substrateRpcUrl: Array<out String>) {
         override fun onTextMessage(websocket: WebSocket?, text: String?) {
             try {
                 val json = JSONObject(text!!)
-                onDebugOnly { log.debug("substrate rpc < $json -- from thread ${Thread.currentThread().name} )") }
+                onDebugOnly { log.debug("rpc ($url) < $json -- from thread ${Thread.currentThread().name} )") }
                 recvChannel.onNext(json)
             } catch (e: JSONException) {
                 // ignore
@@ -96,26 +96,17 @@ class WebSocketRpc(private val substrateRpcUrl: Array<out String>) {
     @Throws(Exception::class)
     private fun open() {
         close()
-        substrateRpcUrl.forEachIndexed { index, url ->
-            try {
-                ws = WebSocketFactory()
-                    .setConnectionTimeout(1000)
-                    .createSocket(url)
-                ws?.pingInterval = 0
-                ws?.addExtension(WebSocketExtension.PERMESSAGE_DEFLATE)
-                ws?.connect()
+        ws = WebSocketFactory()
+            .setConnectionTimeout(1000)
+            .createSocket(url)
+        ws?.pingInterval = 0
+        ws?.addExtension(WebSocketExtension.PERMESSAGE_DEFLATE)
+        ws?.connect()
 
-                cmdId = 1
-                recvChannel = BehaviorSubject.create()
-                ws?.addListener(webSocketListener)
-                return
-            } catch (e: Exception) {
-                if (index == substrateRpcUrl.size - 1) {
-                    throw e
-                }
-                // Else do nothing. Continue to next url in loop.
-            }
-        }
+        cmdId = 1
+        recvChannel = BehaviorSubject.create()
+        ws?.addListener(webSocketListener)
+        return
     }
 
     private fun close() {
@@ -124,7 +115,7 @@ class WebSocketRpc(private val substrateRpcUrl: Array<out String>) {
             ws?.disconnect()
             ws = null
             if (recvChannel?.hasObservers() == true) {
-                recvChannel?.onError(IOException("websocket disconnected"))
+                recvChannel?.onError(IOException("rpc ($url) -- websocket disconnected"))
             }
         } catch (e: Exception) {
             // ignore
@@ -144,7 +135,7 @@ class WebSocketRpc(private val substrateRpcUrl: Array<out String>) {
             .firstOrError()
     }
 
-    fun <T> send(method: RpcMethod): Single<T> {
+    override fun <T> send(method: RpcMethod): Single<T> {
         return Single
             .fromCallable { checkOpen() }
             .map { cmdId++ }
@@ -155,13 +146,17 @@ class WebSocketRpc(private val substrateRpcUrl: Array<out String>) {
                     "method" to method.method
                     "params" to method.params
                 }
-                onDebugOnly { log.debug("substrate rpc > $json") }
+                onDebugOnly { log.debug("rpc ($url)> $json") }
                 ws?.sendText(json.toString())
                 it
             }
             .flatMap {
                 getResponse<T>(it)
             }
+    }
+
+    override fun url(): String {
+        return url
     }
 }
 

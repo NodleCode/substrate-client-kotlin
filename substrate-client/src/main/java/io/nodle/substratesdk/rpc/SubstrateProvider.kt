@@ -17,7 +17,7 @@ import java.nio.ByteBuffer
  * @author Lucien Loiseau on 29/07/20.
  */
 class SubstrateProvider(vararg substrateRpcUrl: String) {
-    val rpc = WebSocketRpc(substrateRpcUrl)
+    val rpc = SubstrateRpc(substrateRpcUrl)
 
     var genesisHash: String? = null
     var metadata: RuntimeMetadata? = null
