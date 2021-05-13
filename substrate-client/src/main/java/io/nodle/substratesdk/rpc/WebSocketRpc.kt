@@ -35,7 +35,7 @@ class WebSocketRpc(private val url: String) : ISubstrateRpc {
                 mutex.withLock {
                     timeout?.cancel()
                     timeout = CoroutineScope(Dispatchers.Default).launch {
-                        delay(10000)
+                        delay(20000)
                         if (isActive) {
                             onDebugOnly { log.debug("rpc ($url) -- timeout fired, closing websocket") }
                             timeout = null
@@ -153,6 +153,10 @@ class WebSocketRpc(private val url: String) : ISubstrateRpc {
             .flatMap {
                 getResponse<T>(it)
             }
+    }
+
+    override fun url(): String {
+        return url
     }
 }
 

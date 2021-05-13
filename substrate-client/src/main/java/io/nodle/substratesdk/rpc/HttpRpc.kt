@@ -60,4 +60,8 @@ class HttpRpc(private val url: String) : ISubstrateRpc {
             }
     }
 
+    override fun url(): String {
+        return url
+    }
+
 }

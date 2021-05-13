@@ -9,4 +9,6 @@ interface ISubstrateRpc {
 
     fun <T> send(method: RpcMethod): Single<T>
 
+    fun url() : String
+
 }
