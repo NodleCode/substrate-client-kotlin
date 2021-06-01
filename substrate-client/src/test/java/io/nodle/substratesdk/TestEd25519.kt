@@ -30,4 +30,17 @@ class TestEd25519 {
         val signature = wallet.privateKey.signMsg("0300ffe432904cb94fdf27c6fdaad7985391f7bbe578e2df5ae1a6788bb07b5d6f15cf280048002d00000003000000f18113a0061d72db857d3b3e2f261e1c214989d191fa57380e633cc5c1a2ad38f18113a0061d72db857d3b3e2f261e1c214989d191fa57380e633cc5c1a2ad38".hexToBa())
         Assert.assertThat(signature.toHex(), CoreMatchers.equalTo("2f0fada4259e8faf06806d0d56e72a0fb592f8923407f46637f4edd3e13b80082e75b22615059707d9523baf7ed706249c89ef518c0ff06912b654101385990f"))
     }
+
+    @Test
+    fun stage1_testSS58() {
+        val wallet1 = Wallet("void come effort suffer camp survey warrior heavy shoot primary clutch crush open amazing screen patrol group space point ten exist slush involve unfold")
+        val ss58Substrate = wallet1.toSS58()
+        Assert.assertThat(ss58Substrate, CoreMatchers.equalTo("5F3qnP81P18AzbX5dTRUGmHZf19dF3qDc877SGHDpK8RfFLX"))
+
+        val ss58SubstrateGeneric = wallet1.toSS58(0x2a)
+        Assert.assertThat(ss58SubstrateGeneric, CoreMatchers.equalTo("5F3qnP81P18AzbX5dTRUGmHZf19dF3qDc877SGHDpK8RfFLX"))
+
+        val ss58SubstrateNodle = wallet1.toSS58(0x25)
+        Assert.assertThat(ss58SubstrateNodle, CoreMatchers.equalTo("4k7YVRQzTYkYDJVm6o2MPFxSRaS9y8gcfRLTMr4iW39zFk2F"))
+    }
 }

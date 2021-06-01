@@ -54,6 +54,10 @@ open class Account() {
         return ss58
     }
 
+    fun toSS58(substrateID: Byte): String {
+        return ss58.ss58ToBa().toSS58(substrateID)
+    }
+
     fun toHex(): String {
         return "0x" + ss58.ss58ToBa().toHex()
     }

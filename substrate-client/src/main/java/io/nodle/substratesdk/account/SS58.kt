@@ -12,9 +12,8 @@ import java.lang.Exception
  */
 private val contextPrefix = "SS58PRE".toByteArray()
 
-fun ByteArray.toSS58(): String {
-    // address-Type is Generic Substrate wildcard
-    val body = byteArrayOf(0x2a) + this
+fun ByteArray.toSS58(substrateID: Byte = 0x2a): String {
+    val body = byteArrayOf(substrateID) + this
 
     // documentation says blake2b-256 but reference implementation use 512 bits
     // https://github.com/paritytech/substrate/blob/master/primitives/core/src/crypto.rs
