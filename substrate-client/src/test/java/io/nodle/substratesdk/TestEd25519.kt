@@ -32,7 +32,7 @@ class TestEd25519 {
     }
 
     @Test
-    fun stage1_testSS58() {
+    fun stage2_testSS58() {
         val wallet1 = Wallet("void come effort suffer camp survey warrior heavy shoot primary clutch crush open amazing screen patrol group space point ten exist slush involve unfold")
         val ss58Substrate = wallet1.toSS58()
         Assert.assertThat(ss58Substrate, CoreMatchers.equalTo("5F3qnP81P18AzbX5dTRUGmHZf19dF3qDc877SGHDpK8RfFLX"))

@@ -16,4 +16,17 @@ data class AccountData(
     var free: BigInteger,
     var reserved: BigInteger,
     var miscFrozen: BigInteger,
-    var feeFrozen: BigInteger)
+    var feeFrozen: BigInteger
+)
+
+val nullAccountInfo = AccountInfo(
+    0.toUInt(),
+    0.toUInt(),
+    0.toUInt(),
+    AccountData(
+        0.toBigInteger(),
+        0.toBigInteger(),
+        0.toBigInteger(),
+        0.toBigInteger()
+    )
+)

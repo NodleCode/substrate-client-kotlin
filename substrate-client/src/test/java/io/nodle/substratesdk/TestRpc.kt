@@ -1,8 +1,6 @@
 package io.nodle.substratesdk
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
-import com.google.common.collect.Range.greaterThan
-import io.nodle.substratesdk.account.Account
 import io.nodle.substratesdk.account.Wallet
 import io.nodle.substratesdk.rpc.SubstrateProvider
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -17,7 +15,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import org.mockserver.client.server.MockServerClient
-import sun.font.CoreMetrics
 
 /**
  * @author Lucien Loiseau on 31/05/20.
@@ -108,7 +105,13 @@ class TestRpc {
             Wallet(bobMnemonic)
         val balance3 = wallet3.getAccountInfo(provider).blockingGet()
         Assert.assertThat(balance3.data.free.toLong(), CoreMatchers.notNullValue())
+
+        val wallet4 =
+            Wallet("cherry royal innocent naive motor album pride humble deliver leaf trick series")
+        val balance4 = wallet4.getAccountInfo(provider).blockingGet()
+        Assert.assertThat(balance4.data.free.toLong(), CoreMatchers.equalTo(0))
     }
+
 
     @ExperimentalUnsignedTypes
     @Test
