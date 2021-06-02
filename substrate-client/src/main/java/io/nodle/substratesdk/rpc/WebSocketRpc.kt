@@ -129,8 +129,11 @@ class WebSocketRpc(private val url: String) : ISubstrateRpc {
                 if (it.has("error")) {
                     throw Exception(it.getJSONObject("error").toString())
                 }
-                @Suppress("UNCHECKED_CAST") // if it fails it throws an exception
-                it.get("result") as T
+                it.opt("result")?.let { result ->
+                    @Suppress("UNCHECKED_CAST") // if it fails it throws an exception
+                    if (!JSONObject.NULL.equals(result)) result as T
+                    else throw NullJsonObjectException()
+                } ?: throw Exception("query result not available")
             }
             .firstOrError()
     }
