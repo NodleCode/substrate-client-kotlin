@@ -10,7 +10,7 @@ class NullJsonObjectException : Exception()
 
 interface ISubstrateRpc {
 
-    fun <T> send(method: RpcMethod): Single<T>
+    fun <T> send(method: RpcMethod, defaultValue: T? = null): Single<T>
 
     fun url() : String
 

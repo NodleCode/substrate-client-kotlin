@@ -24,14 +24,12 @@ class SubstrateRpc(substrateUrls: Array<out String>) {
      * TODO: would be nice to not do any blockingget in there,
      * feels a bit like cheating, not really rxjava-ly
      */
-    fun <T> send(method: RpcMethod): Single<T> {
+    fun <T> send(method: RpcMethod, defaultValue: T? = null): Single<T> {
         return Single.just(rpcEndpoints)
             .map {
                 it.forEach { rpc ->
                     try {
-                        return@map rpc.send<T>(method).blockingGet()
-                    } catch(n: NullJsonObjectException) {
-                        throw n // we got a response
+                        return@map rpc.send<T>(method, defaultValue).blockingGet()
                     } catch (e: Exception) {
                         onDebugOnly { log.debug("rpc error (${rpc.url()}) !! ${e.message}") }
                         // ignore

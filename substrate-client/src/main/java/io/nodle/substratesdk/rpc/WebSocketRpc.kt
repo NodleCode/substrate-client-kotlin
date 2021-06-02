@@ -122,7 +122,7 @@ class WebSocketRpc(private val url: String) : ISubstrateRpc {
         }
     }
 
-    private fun <T> getResponse(queryId: Int): Single<T> {
+    private fun <T> getResponse(queryId: Int, defaultValue: T?): Single<T> {
         return recvChannel
             .filter { it.getInt("id") == queryId }
             .map {
@@ -132,13 +132,13 @@ class WebSocketRpc(private val url: String) : ISubstrateRpc {
                 it.opt("result")?.let { result ->
                     @Suppress("UNCHECKED_CAST") // if it fails it throws an exception
                     if (!JSONObject.NULL.equals(result)) result as T
-                    else throw NullJsonObjectException()
+                    else defaultValue ?: throw NullJsonObjectException()
                 } ?: throw Exception("query result not available")
             }
             .firstOrError()
     }
 
-    override fun <T> send(method: RpcMethod): Single<T> {
+    override fun <T> send(method: RpcMethod, defaultValue: T?): Single<T> {
         return Single
             .fromCallable { checkOpen() }
             .map { cmdId++ }
@@ -154,7 +154,7 @@ class WebSocketRpc(private val url: String) : ISubstrateRpc {
                 it
             }
             .flatMap {
-                getResponse<T>(it)
+                getResponse<T>(it, defaultValue)
             }
     }
 

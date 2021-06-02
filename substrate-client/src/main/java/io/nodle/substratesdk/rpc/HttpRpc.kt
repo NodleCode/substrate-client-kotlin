@@ -14,7 +14,7 @@ import java.net.URL
 class HttpRpc(private val url: String) : ISubstrateRpc {
     private val log: Logger = LoggerFactory.getLogger(HttpRpc::class.java)
 
-    override fun <T> send(method: RpcMethod): Single<T> {
+    override fun <T> send(method: RpcMethod, defaultValue: T?): Single<T> {
         return Single.just(url)
             .map { url ->
                 val connection = (URL(url).openConnection() as HttpURLConnection)
@@ -59,7 +59,7 @@ class HttpRpc(private val url: String) : ISubstrateRpc {
                 it.opt("result")?.let { result ->
                     @Suppress("UNCHECKED_CAST") // if it fails it throws an exception
                     if (!JSONObject.NULL.equals(result)) result as T
-                    else throw NullJsonObjectException()
+                    else defaultValue ?: throw NullJsonObjectException()
                 } ?: throw Exception("result not available")
             }
     }

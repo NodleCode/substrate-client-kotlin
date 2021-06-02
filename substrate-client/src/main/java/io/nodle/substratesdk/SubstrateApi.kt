@@ -27,18 +27,15 @@ fun Account.getAccountInfo(provider: SubstrateProvider): Single<AccountInfo> {
         .flatMap { metadata ->
             val ba = toU8a()
             val key = "System".xxHash128() + "Account".xxHash128() + ba.blake128() + ba
-            provider.rpc.send<String>(StateGetStorage("0x" + key.toHex()))
+            provider.rpc.send<String>(StateGetStorage("0x" + key.toHex()), "")
                 .map { scale ->
-                    when (metadata.version) {
-                        in 0..11 -> ByteBuffer.wrap(scale.hexToBa()).readAccountInfoV1()
-                        else -> ByteBuffer.wrap(scale.hexToBa()).readAccountInfoSub3()
-                    }
-                }
-                .onErrorReturn {
-                    if (it is NullJsonObjectException) {
+                    if (scale == "") {
                         nullAccountInfo
                     } else {
-                        throw it
+                        when (metadata.version) {
+                            in 0..11 -> ByteBuffer.wrap(scale.hexToBa()).readAccountInfoV1()
+                            else -> ByteBuffer.wrap(scale.hexToBa()).readAccountInfoSub3()
+                        }
                     }
                 }
         }
