@@ -30,6 +30,8 @@ class SubstrateRpc(substrateUrls: Array<out String>) {
                 it.forEach { rpc ->
                     try {
                         return@map rpc.send<T>(method).blockingGet()
+                    } catch(n: NullJsonObjectException) {
+                        throw n // we got a response
                     } catch (e: Exception) {
                         onDebugOnly { log.debug("rpc error (${rpc.url()}) !! ${e.message}") }
                         // ignore

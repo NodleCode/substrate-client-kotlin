@@ -60,7 +60,7 @@ class HttpRpc(private val url: String) : ISubstrateRpc {
                     @Suppress("UNCHECKED_CAST") // if it fails it throws an exception
                     if (!JSONObject.NULL.equals(result)) result as T
                     else throw NullJsonObjectException()
-                } ?: throw Exception("query result not available")
+                } ?: throw Exception("result not available")
             }
     }
 
