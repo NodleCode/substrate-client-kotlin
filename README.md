@@ -1,5 +1,6 @@
 # Kotlin Substrate Client
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![jitpack](https://jitpack.io/v/NodleCode/substrate-client-kotlin.svg)](https://jitpack.io/#NodleCode/substrate-client-kotlin)
 
 substrate-client-kotlin is client library to interact with a substrate-based chain.
 It uses the API available from the RPC endpoint only (no sidecar).
@@ -18,14 +19,17 @@ what is currently **not** supported
 
 ## Using the library
 
-1. Add the JitPack repository.
+1. Add `jcenter`, the JitPack repository. Consider [filtering](https://docs.gradle.org/current/userguide/declaring_repositories.html#sec:declaring-repository-filter).
 ```
-allprojects {
   repositories {
     ...
-    maven { url 'https://jitpack.io' }
+    jcenter() // for just 2 io.github.novacrypto deps (SHA256, ToRuntime) required by NodleCode.BIP39:
+    maven { url 'https://jitpack.io'
+      // for https://github.com/NodleCode/substrate-client-kotlin
+      //content { includeGroup "com.github.NodleCode" }
+    }  
   }
-}
+
 ```
 
 2. Add the substrate-client dependency
