@@ -27,8 +27,14 @@ afterEvaluate {
 
 project.compileKotlin.dependsOn(createVersionFile)
 
+
+repositories {
+    google()
+    jcenter() // for just 2 novacrypto deps required by BIP39
+    maven { url 'https://jitpack.io' }
+}
+
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
     api group: 'org.slf4j', name:'slf4j-api', version: '1.7.30'
 
     // websocket
@@ -42,7 +48,7 @@ dependencies {
 
     // BIP-39: key generation from 12 words mnemonic
     // not a fan of this dependency because it comes with spongy castle which we don't need
-    implementation 'com.github.NodleCode:BIP39:484f9d5d588'
+    implementation 'com.github.NodleCode:BIP39:484f9d5d588' // https://jitpack.io/#nodlecode/bip39/484f9d5d58
     implementation 'com.github.komputing:KBase58:0.1'
 
     // kotlin

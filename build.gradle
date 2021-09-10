@@ -28,14 +28,6 @@ static def gitSha() {
     sha
 }
 
-allprojects {
-    repositories {
-        google()
-        jcenter()
-        maven { url 'https://jitpack.io' }
-    }
-}
-
 ext {
     serialization_version = "0.20.0"
     kotlinxCoroutine = "1.4.2"
