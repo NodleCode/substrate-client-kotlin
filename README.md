@@ -19,13 +19,15 @@ what is currently **not** supported
 
 ## Using the library
 
-1. Add the JitPack repository.
+1. Add `jcenter`, the JitPack repository. Consider [filtering](https://docs.gradle.org/current/userguide/declaring_repositories.html#sec:declaring-repository-filter).
 ```
   repositories {
     ...
-    maven { url 'https://jitpack.io' }
+    jcenter() // for just 2 io.github.novacrypto deps (SHA256, ToRuntime) required by NodleCode.BIP39:
+    maven { url 'https://jitpack.io'
       // for https://github.com/NodleCode/substrate-client-kotlin
-      content { includeGroup "com.github.NodleCode" }
+      //content { includeGroup "com.github.NodleCode" }
+    }  
   }
 
 ```
